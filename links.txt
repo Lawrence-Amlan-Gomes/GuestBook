@@ -1,6 +1,4 @@
-https://github.com/Learn-with-Sumit/assignment-1-smartgrade-showcase-Lawrence-Amlan-Gomes
 
-https://lws-react-js-assignment-1.vercel.app/
 
 apiKey: "AIzaSyCYQlMz7DJ1cp5CYA3GrcoPHyNRHYAW1sk",
 authDomain: "guestbook-e46b4.firebaseapp.com",
