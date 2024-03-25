@@ -1,66 +1,123 @@
-import { useState } from "react";
+import { registerWithEmailAndPassword, db } from "../firebase";
 import { NavLink, useNavigate } from "react-router-dom";
-import { registerWithEmailAndPassword } from "../firebase";
+import FieldSet from "../components/FieldSet";
+import Field from "../components/Field";
+import { useForm } from "react-hook-form";
+import { collection, addDoc } from "firebase/firestore";
+import { useState } from "react";
 
 const Register = () => {
-    const navigate = useNavigate();
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
 
-    const handleSubmit = async (event) => {
-      event.preventDefault();
-      try{
-        const user = await registerWithEmailAndPassword(email, password);
-        console.log(user);
+  const typing = () => {
+    setIsTyping(true);
+  };
+
+  const navigate = useNavigate();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setError,
+  } = useForm();
+
+  const submitForm = async (formData) => {
+    const sureSubmit = confirm(
+      "You can set your name only once. Are you sure to Register?"
+    );
+    if (sureSubmit) {
+      try {
+        const response = await registerWithEmailAndPassword(
+          formData.email,
+          formData.password
+        );
+        await addDoc(collection(db, "Guests"), {
+          name: formData.name,
+          email: formData.email,
+          photo: false,
+          bio: "add your bio",
+        });
+        console.log(response);
         navigate("/login");
-      } catch (err) {
-        console.log(err);
+      } catch (error) {
+        setError("root.random", {
+          message: `This email is taken`,
+          type: "random",
+        });
       }
     }
+    setIsTyping(false);
+  };
 
-    return (
-        <div className="flex flex-col p-4 justify-center items-center">
-            <h1 className="text-3xl my-2">Register</h1>
-            <form className="flex flex-col">
-                <div className="my-1">
-                    <label htmlFor="email">Email address</label>
-                    <input
-                        type="email"
-                        id="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                        placeholder="Email address"
-                        className="mx-2 my-2 p-1 border border-gray-100 rounded-sm"
-                    />
-                </div>
-                <div>
-                    <label htmlFor="password">Password</label>
-                    <input
-                        type="password"
-                        id="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                        placeholder="Password"
-                        className="mx-2 my-2 p-1 border border-gray-100 rounded-sm"
-                    />
-                </div>
-                <button
-                  type="submit"
-                  onClick={handleSubmit}
-                  className="bg-black text-white p-1 rounded-md m-auto">
-                  Register
-                </button>
-            </form>
-            <p className="my-2">
-              Already Have an Account? {' '}
-              <NavLink to="/login" className="underline">
-                Sign In
-              </NavLink>
-            </p>
-        </div>
-    );
+  return (
+    <div className="flex flex-col justify-center items-center text-white text-center border-2 border-sky-700 p-5 rounded-[10px]">
+      <form onSubmit={handleSubmit(submitForm)}>
+        <FieldSet label="Enter Registration Details">
+          <Field label="Name" error={errors.name}>
+            <input
+              {...register("name", { required: "Name is required." })}
+              className={`p-2 border box-border w-[300px] rounded-md text-blue-950 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 ${
+                !errors.name ? "border-gray-200" : "border-red-500"
+              }`}
+              type="name"
+              name="name"
+              id="name"
+              placeholder="Enter name address"
+              onChange={typing}
+            />
+          </Field>
+          <Field label="Email" error={errors.email}>
+            <input
+              {...register("email", { required: "Email is required." })}
+              className={`p-2 border box-border w-[300px] rounded-md text-blue-950 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 ${
+                !errors.email ? "border-gray-200" : "border-red-500"
+              }`}
+              type="email"
+              name="email"
+              id="email"
+              placeholder="Enter email address"
+              onChange={typing}
+            />
+          </Field>
+          <Field label="Password" error={errors.password}>
+            <input
+              {...register("password", {
+                required: "Password is required.",
+                minLength: {
+                  value: 8,
+                  message: "Your password must be at least 8 characters.",
+                },
+              })}
+              className={`p-2 border box-border w-[300px] rounded-md text-blue-950 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 ${
+                !errors.password ? "border-gray-200" : "border-red-500"
+              }`}
+              type="password"
+              name="password"
+              id="password"
+              placeholder="Enter Password"
+              onChange={typing}
+            />
+          </Field>
+        </FieldSet>
+        {!isTyping ? (
+          <div className="text-red-700">{errors?.root?.random?.message}</div>
+        ) : (
+          <></>
+        )}
+        <Field>
+          <button className="text-md text-white cursor-pointer border rounded-lg bg-blue-700 m-auto mt-5 p-2">
+            Register
+          </button>
+        </Field>
+      </form>
+      <p className="my-2">
+        Already Have An Account?{" "}
+        <NavLink to="/login" className="underline">
+          Login
+        </NavLink>
+      </p>
+    </div>
+  );
 };
 
 export default Register;

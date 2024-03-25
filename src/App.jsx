@@ -4,12 +4,13 @@ import Home from './page/Home';
 import Reset from './page/Reset';
 import Register from './page/Register';
 import PrivateRoutes from './routes/PrivateRoutes';
+import "./style/main.css";
+
 
 function App() {
-
   return (
     <Router>
-     <div>
+     <div className='flex justify-center items-center h-[700px] text-white'>
       <Routes>
         <Route element={<PrivateRoutes />}>
           <Route path="/home" element={<Home />} />

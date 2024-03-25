@@ -8,21 +8,26 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
 } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
+
 
 // Your web app's Firebase configuration
 // Create a .env file to keep your app configurations
 // Find an .env.examples file for reference under the project folder.
 const firebaseConfig = {
-  apiKey: "AIzaSyCYQlMz7DJ1cp5CYA3GrcoPHyNRHYAW1sk",
-  authDomain: "guestbook-e46b4.firebaseapp.com",
-  projectId: "guestbook-e46b4",
-  storageBucket: "guestbook-e46b4.appspot.com",
-  messagingSenderId: "761619793810",
-  appId: "1:761619793810:web:a6ce569041dbefa461a34b",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_MESSAGING_APP_ID,
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const storage = getStorage(app);
 const auth = getAuth(app);
 const googleAuthProvider = new GoogleAuthProvider();
 
@@ -71,6 +76,8 @@ export {
   loginWithEmailAndPassword,
   registerWithEmailAndPassword,
   auth,
+  db,
+  storage,
   sendPasswordReset,
   signInWithGoogle,
 };
